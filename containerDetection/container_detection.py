@@ -1,8 +1,13 @@
 from coco_processor import COCOProcessor
 from  container_data_processor import ContainerDataProcessor
 from container_detection_trainer import ContainerDetectionTrainer
+from container_detection_inference import ContainerDetectionInference
 import os
 import argparse
+import sys
+from pathlib import Path
+
+
 
 def prepare_data(source_image_path,coco_path,annotations_path,results_path):
     """Function to prepare the data."""
@@ -31,16 +36,40 @@ def prepare_data(source_image_path,coco_path,annotations_path,results_path):
 
        
 
-def train_model(annotations_path,source_image_path,results_path):
+def train_model(annotations_path,source_image_path,results_path,model_path):
     """Function to train the model."""
     print("Training the model...")
     # Usage example
-    trainer = ContainerDetectionTrainer(annotations_path=annotations_path, image_path=source_image_path,data_path=results_path,experiment_name="ContainerDetection",n_epochs=25)
+    trainer = ContainerDetectionTrainer(annotations_path=annotations_path, image_path=source_image_path,data_path=results_path,experiment_name="ContainerDetection",n_epochs=25,model_path=model_path)
     trainer.train_and_validate()
     print("Model training completed.")
 
 
-def main(prep=False, train=False):
+
+
+def inference_model(path,model_path):
+   
+    inference = ContainerDetectionInference(model_path=model_path)
+    image_files = []
+    
+    if os.path.isdir(path):
+        dir_path = Path(path)
+        for file in dir_path.rglob('*'):
+            if file.is_file():
+                image_files.append(file)
+    else:
+        image_files.append(path)
+
+    print(f"{len(image_files)} images for inference")
+
+
+    results = inference.inference_model(image_files)
+
+    return results
+
+
+
+def main(prep=False, train=False, infer=False, path=""):
     """
     Arguments:
     prep (bool): If True, prepare the data.
@@ -51,6 +80,7 @@ def main(prep=False, train=False):
     source_image_path = f"{os.path.dirname((os.path.dirname(os.path.abspath(__file__))))}\data\captured_images"
     coco_path = 'cocofiles\\container_coco.json'
     results_path = 'datafiles/data_retrain.json'
+    model_path="trained_models/frcnn_container.pt"
 
     try:
 
@@ -58,8 +88,11 @@ def main(prep=False, train=False):
             prepare_data(source_image_path,coco_path,annotations_path,results_path)
 
         if train:
-            train_model(annotations_path,source_image_path,results_path)
+            train_model(annotations_path,source_image_path,results_path,model_path)
 
+        if infer:
+            inference_model(path=path, model_path=model_path)
+        
 
     except Exception as error:
         print('Exception: ' + error)  
@@ -72,11 +105,13 @@ if __name__ == "__main__":
     # Set default values for the arguments
     parser.add_argument('--prep', action='store_true', default=False, help="Flag to prepare data (default: False)")
     parser.add_argument('--train', action='store_true', default=False, help="Flag to train the model (default: False)")
+    parser.add_argument('--infer', action='store_true', default=False, help="Flag to inference using file_path (default: False)")
+    parser.add_argument('-path', type=str, required='--infer' in sys.argv , help="file or folder path for container detection")
     
     args = parser.parse_args()
 
     # Use default values if arguments are not provided
-    main(prep=args.prep, train=args.train)
+    main(prep=args.prep, train=args.train, infer=args.infer, path=args.path)
 
 
 

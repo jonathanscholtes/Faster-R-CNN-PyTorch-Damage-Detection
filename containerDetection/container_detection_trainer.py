@@ -11,7 +11,7 @@ import mlflow
 import mlflow.pytorch
 
 class ContainerDetectionTrainer:
-    def __init__(self, annotations_path, image_path, data_path, experiment_name="ContainerDetection",n_epochs=25, tracking_uri="http://localhost:5000"):
+    def __init__(self, annotations_path, image_path, data_path, experiment_name="ContainerDetection",n_epochs=25, model_path="trained_models/frcnn_container.pt", tracking_uri="http://localhost:5000"):
         """
         Initializes the trainer with dataset paths and training settings.
 
@@ -27,6 +27,7 @@ class ContainerDetectionTrainer:
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         self.n_epochs = n_epochs
         self.writer = SummaryWriter()
+        self.model_path = model_path
         mlflow.set_tracking_uri(tracking_uri)
         mlflow.set_experiment(experiment_name)
         self._load_data()
@@ -117,7 +118,7 @@ class ContainerDetectionTrainer:
                                val_theta_loss=theta_loss, val_acc=accs.mean(), end='\r')
 
                     if loss.item() <= min(val_losses):
-                        torch.save(frcnn.state_dict(), 'trained_models/frcnn_container.pt')
+                        torch.save(frcnn.state_dict(), self.model_path)
                         best_accuracy = accs.mean()
 
                 log.report_avgs(epoch + 1)
