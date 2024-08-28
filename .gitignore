@@ -4,4 +4,4 @@ __pycache__/
 runs
 mlruns
 *.pt
-*.png
+data
