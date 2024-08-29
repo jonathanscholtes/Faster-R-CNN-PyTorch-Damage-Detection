@@ -16,6 +16,7 @@ def threaded(fn):
         return thread
     return wrapper
 
+store_lock = threading.Lock()
 
 class ContainerDataProcessor:
     """
@@ -66,6 +67,7 @@ class ContainerDataProcessor:
         for batch in batches:
             t=self._process_batch(args=batch)
             threads.append(t)
+            
 
         for t in threads:
             t.join()
@@ -81,18 +83,22 @@ class ContainerDataProcessor:
         
         #self.ds
         for ix, (im, bbs, labels, theta, fpath) in enumerate(batch):
-            
+            time.sleep(.001)
+
             if ix == self.N:
                 break
             
             H, W, _ = im.shape
             candidates = self._get_candidates(im)
             ious, rois, clss, deltas, thetas = self._process_candidates(candidates, bbs, theta, H, W)
-            time.sleep(.001)
-
+            
+            #store_lock.acquire()
             self._store_results(fpath, ious, rois, clss, deltas, bbs, thetas)
-
+        
             self.bar.next()
+
+            #store_lock.release()
+          
     
 
     def _bar_widget(self, max_value):
