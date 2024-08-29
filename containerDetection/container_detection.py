@@ -47,29 +47,29 @@ def train_model(annotations_path,source_image_path,results_path,model_path):
 
 
 
-def inference_model(path,model_path):
+def inference_model(infer_source,infer_dest,model_path):
    
     inference = ContainerDetectionInference(model_path=model_path)
     image_files = []
     
-    if os.path.isdir(path):
-        dir_path = Path(path)
+    if os.path.isdir(infer_source):
+        dir_path = Path(infer_source)
         for file in dir_path.rglob('*'):
             if file.is_file():
                 image_files.append(file)
     else:
-        image_files.append(path)
+        image_files.append(infer_source)
 
     print(f"{len(image_files)} images for inference")
 
+    results = inference.inference_model(image_files,infer_dest)
 
-    results = inference.inference_model(image_files)
-
+    print(results)
     return results
 
 
 
-def main(prep=False, train=False, infer=False, path=""):
+def main(prep=False, train=False, infer=False, infer_source="", infer_dest=""):
     """
     Arguments:
     prep (bool): If True, prepare the data.
@@ -91,7 +91,7 @@ def main(prep=False, train=False, infer=False, path=""):
             train_model(annotations_path,source_image_path,results_path,model_path)
 
         if infer:
-            inference_model(path=path, model_path=model_path)
+            inference_model(infer_source=infer_source,infer_dest=infer_dest, model_path=model_path)
         
 
     except Exception as error:
@@ -106,12 +106,14 @@ if __name__ == "__main__":
     parser.add_argument('--prep', action='store_true', default=False, help="Flag to prepare data (default: False)")
     parser.add_argument('--train', action='store_true', default=False, help="Flag to train the model (default: False)")
     parser.add_argument('--infer', action='store_true', default=False, help="Flag to inference using file_path (default: False)")
-    parser.add_argument('-path', type=str, required='--infer' in sys.argv , help="file or folder path for container detection")
+    parser.add_argument('-infer_source', type=str, required='--infer' in sys.argv , help="file or folder path for source images")
+    parser.add_argument('-infer_dest', type=str, required=False , help="folder path image results, will display json if blank")
     
+
     args = parser.parse_args()
 
     # Use default values if arguments are not provided
-    main(prep=args.prep, train=args.train, infer=args.infer, path=args.path)
+    main(prep=args.prep, train=args.train, infer=args.infer, infer_source=args.infer_source,infer_dest=args.infer_dest)
 
 
 

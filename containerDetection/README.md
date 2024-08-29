@@ -88,18 +88,44 @@ This will load the prepared data, initialize the Faster R-CNN model, and begin t
 
 ### Model Inferencing
 
-After the model has been trained, you can perform inference on a batch of images by executing the following command:
-
-<ins>Batch Inference Directory:</ins>
-```bash
-python container_detection.py --infer --path='<path>\data\captured_images'
-```
--or-
+After the model has been trained, you can perform inference on a single image passing a single image file to the **infer_source** argument:
 
 <ins>Inference Single Image:</ins>
+
 ```bash
-python container_detection.py --infer -path='<path>\data\captured_images\3_hill_9afe1737-21f7-4c2b-8576-225e79a06dbe_44R8_1.png'
+python container_detection.py --infer -infer_source='<path>\data\captured_images\3_hill_9afe1737-21f7-4c2b-8576-225e79a06dbe_44R8_1.png'
 ```
+
+Running the above command will output the bounding box of the detected container (bbs) and rotation (theta).
+
+```bash
+[{'bbs': [1.5755553279438467e-05, 0.34037946077582776, 0.8073451248222778, 0.6308845540233812], 'theta': -0.14000000059604645, 'image_path': '<path>\\data\\captured_images\\3_hill_9afe1737-21f7-4c2b-8576-225e79a06dbe_44R8_1.png'}]
+```
+
+Passing a directory to **infer_source** will batch process all images in the directory:
+
+<ins>Batch Inference Directory:</ins>
+
+```bash
+python container_detection.py --infer --infer_source='<path>\data\captured_images'
+```
+
+It is also possible to save the detected container to an output directory by passing the output directory path to the **-infer_des** argument.
+
+<ins>Inference with Output Images:</ins>
+
+```bash
+python container_detection.py --infer -infer_source='<path>\data\captured_images\3_hill_9afe1737-21f7-4c2b-8576-225e79a06dbe_44R8_1.png' -infer_dest='<path>\data\container_damage\'
+```
+Running the above command will add the output file path to the json results and write the extracted container to the specified path.
+
+```bash
+[{'bbs': [1.5755553279438467e-05, 0.34037946077582776, 0.8073451248222778, 0.6308845540233812], 'theta': -0.14000000059604645, 'image_path': '<path>\\data\\captured_images\\3_hill_9afe1737-21f7-4c2b-8576-225e79a06dbe_44R8_1.png', 'output_file': '<path>\\data\\container_damage\\3_hill_9afe1737-21f7-4c2b-8576-225e79a06dbe_44R8_1.png'}]
+```
+
+Output images are scaled (800,800) and rotated (theta) for damage detection
+
+![extracted](../images/extracted_container.png)
 
 ## Experiments Tracking
 
