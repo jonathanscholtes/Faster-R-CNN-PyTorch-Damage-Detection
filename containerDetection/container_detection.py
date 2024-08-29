@@ -79,7 +79,7 @@ def main(prep=False, train=False, infer=False, infer_source="", infer_dest=""):
     annotations_path = 'annotations\\annotations.json'
     source_image_path = f"{os.path.dirname((os.path.dirname(os.path.abspath(__file__))))}\data\captured_images"
     coco_path = 'cocofiles\\container_coco.json'
-    results_path = 'datafiles/data_retrain.json'
+    results_path = 'datafiles/data.json'
     model_path="trained_models/frcnn_container.pt"
 
     try:
@@ -95,7 +95,7 @@ def main(prep=False, train=False, infer=False, infer_source="", infer_dest=""):
         
 
     except Exception as error:
-        print('Exception: ' + error)  
+        print('Exception: ' + str(error))  
 
 
 

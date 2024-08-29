@@ -7,7 +7,7 @@ import torch
 import cv2
 import numpy as np
 from torchvision import transforms, models, datasets
-
+import math
 
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -31,6 +31,7 @@ class CoCoDataSet(Dataset):
         super().__init__()
 
         self.path = os.path.expanduser(path)
+        self.annotation = annotations
         with redirect_stdout(None):
             self.coco = COCO(annotations)
         self.ids = list(self.coco.imgs.keys())
@@ -76,6 +77,26 @@ class CoCoDataSet(Dataset):
 
 
         return boxes , categories
+    
+    def split_into_chunks(self, num_chunks):
+        
+        chunk_size = math.ceil(len(self.ids) / num_chunks)
+
+        chunks = []
+        
+        for i in range(num_chunks):
+            start = i * chunk_size
+            end = start + chunk_size
+            chunk_dataset = CoCoDataSet(
+                self.path,
+                annotations=self.annotation
+            )
+            chunk_dataset.ids = self.ids[start:end]
+            chunk_dataset.coco = self.coco
+            chunk_dataset.categories_inv = self.categories_inv if hasattr(self, 'categories_inv') else None
+            chunks.append(chunk_dataset)
+        
+        return chunks
 
 class ContainerDataset(Dataset):
     def __init__(self,path, fpaths, rois, labels, deltas, gtbbs,thetas):
@@ -118,6 +139,27 @@ class ContainerDataset(Dataset):
         deltas = torch.Tensor(deltas).float().to(device)
         thetas = torch.Tensor(thetas).float().to(device)
         return input, rois, rixs, labels, deltas,thetas
+    
+    def split_into_chunks(self, chunk_size):
+
+        num_chunks = math.ceil(len(self.fpaths) / chunk_size)
+        chunks = []
+        
+        for i in range(num_chunks):
+            start = i * chunk_size
+            end = start + chunk_size
+            chunk_dataset = ContainerDataset(
+                self.path,
+                self.fpaths[start:end],
+                self.rois[start:end],
+                self.labels[start:end],
+                self.deltas[start:end],
+                self.gtbbs[start:end],
+                self.thetas[start:end]
+            )
+            chunks.append(chunk_dataset)
+        
+        return chunks
 
 
 

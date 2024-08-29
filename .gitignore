@@ -5,3 +5,5 @@ runs
 mlruns
 *.pt
 data
+containerDetection/training.json
+containerDetection/val.json

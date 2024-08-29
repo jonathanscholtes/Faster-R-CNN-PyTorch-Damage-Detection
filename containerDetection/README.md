@@ -17,15 +17,19 @@ This repository contains the implementation of a **container detection** system 
 - [License](#license)
 - [Disclaimer](#disclaimer)
 
+<br/>
 
 ## Overview
 
-This project focuses on detecting containers in images using the Faster R-CNN architecture. The pipeline includes:
+This project focuses on detecting containers in images using the Faster R-CNN architecture.
+
+Instance Segmentation polygons are captured using Azure Machine Learning [Data Labling](https://learn.microsoft.com/en-us/azure/machine-learning/how-to-create-image-labeling-projects?view=azureml-api-2) and exported as COCO file for data prep.
 
 1. Data preparation from annotated images.
 2. Training and validating the model using a dataset of containers.
 3. Experiment tracking with MLflow and visualization using TensorBoard.
 
+<br/>
 
 ## Installation
 
@@ -52,6 +56,8 @@ python -m pip install -r requirements.txt
 ```
 
 
+<br/>
+
 ## Usage
 
 ### Preparing Data
@@ -66,6 +72,8 @@ python container_detection.py --prep
 ```
 
 This will load and process the annotated images into a format ready for training. Please note that data preparation using selective search may require a considerable amount of time.
+
+---
 
 
 ### Training the Model
@@ -85,6 +93,7 @@ python container_detection.py --train
 
 This will load the prepared data, initialize the Faster R-CNN model, and begin the training process. The training progress will be tracked using TensorBoard and MLflow.
 
+---
 
 ### Model Inferencing
 
@@ -127,6 +136,8 @@ Output images are scaled (800,800) and rotated (theta) for damage detection
 
 ![extracted](../images/extracted_container.png)
 
+<br/>
+
 ## Experiments Tracking
 
 This project leverages MLflow for comprehensive experiment tracking and TensorBoard for real-time training visualization.
@@ -140,10 +151,12 @@ tensorboard --logdir=runs
 
 For monitoring training progress with TensorBoard, open your browser and go to http://localhost:6006. TensorBoard provides detailed visualizations, including loss curves, accuracy metrics, and other insights, enabling you to track model performance throughout the training process.
 
+<br/>
 
 ## License
 This project is licensed under the [MIT License](../LICENSE.md), granting permission for commercial and non-commercial use with proper attribution.
 
+<br/>
 
 ## Disclaimer
 This project is offered exclusively for educational and demonstration purposes. While every effort has been made to ensure accuracy and functionality, it is provided "as-is" without any warranties or guarantees. Users are advised to exercise caution and assume full responsibility for any risks or outcomes associated with its use.

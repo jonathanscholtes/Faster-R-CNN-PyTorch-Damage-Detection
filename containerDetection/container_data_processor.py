@@ -4,6 +4,17 @@ import json
 from torch_snippets import *
 from model.dataset import CoCoDataSet, preprocess_image
 from util.iou_extract import extract_candidates, extract_iou
+import progressbar
+import threading
+import time
+
+
+def threaded(fn):
+    def wrapper(*args, **kwargs):
+        thread =threading.Thread(target=fn, args=args, kwargs=kwargs)
+        thread.start()
+        return thread
+    return wrapper
 
 
 class ContainerDataProcessor:
@@ -12,7 +23,7 @@ class ContainerDataProcessor:
         
     """
    
-    def __init__(self, image_path, annotations_path, results_path, N=500):
+    def __init__(self, image_path, annotations_path, results_path, N=500, thread_count=8):
         """        
         Parameters:
         dataset_path (str): Path to the directory containing the dataset images.
@@ -27,6 +38,8 @@ class ContainerDataProcessor:
         # Set the number of images to process
         self.N = N
         
+        self.thread_count = thread_count
+
         # Target labels: background = 0, container = 1
         self.target2label = ['background', 'container']
         
@@ -36,14 +49,38 @@ class ContainerDataProcessor:
          # Initialize lists to store processed data: file paths, ground truth boxes, class labels, 
         # deltas (coordinate adjustments), regions of interest (ROIs), IoUs, and rotation angles (thetas)
         self.FPATHS, self.GTBBS, self.CLSS, self.DELTAS, self.ROIS, self.IOUS, self.THETAS = [], [], [], [], [], [], []
-    
-    def process_dataset(self):
-        cntr = min(len(self.ds), self.N)
-        bar = ''
         
-        for ix, (im, bbs, labels, theta, fpath) in enumerate(self.ds):
-            bar += "\u2588"
-            self._update_progress_bar(ix, cntr, bar)
+
+    def process_dataset(self):
+        max_value = min(len(self.ds), self.N)
+        self.bar = progressbar.ProgressBar(widgets=self._bar_widget(max_value), max_value=max_value)
+        
+        threads = []
+        
+        batches= self.ds.split_into_chunks(self.thread_count)
+
+        print(len(batches))
+        print(len(batches[0]))
+       
+    
+        for batch in batches:
+            t=self._process_batch(args=batch)
+            threads.append(t)
+
+        for t in threads:
+            t.join()
+
+        print("Finalize")
+        self._finalize_results()
+
+
+    @threaded
+    def _process_batch(self,args):
+        batch = args
+        print(batch)
+        
+        #self.ds
+        for ix, (im, bbs, labels, theta, fpath) in enumerate(batch):
             
             if ix == self.N:
                 break
@@ -51,20 +88,30 @@ class ContainerDataProcessor:
             H, W, _ = im.shape
             candidates = self._get_candidates(im)
             ious, rois, clss, deltas, thetas = self._process_candidates(candidates, bbs, theta, H, W)
-            
+            time.sleep(.001)
+
             self._store_results(fpath, ious, rois, clss, deltas, bbs, thetas)
 
-        self._finalize_results()
+            self.bar.next()
+    
 
-    def _update_progress_bar(self, ix, cntr, bar):
-        sys.stdout.write(bar + "\r%d%%" % ix)
-        sys.stdout.flush()
-        bar_length = 50
-        percent = float(ix) / cntr
-        hashes = '#' * int(round(percent * bar_length))
-        spaces = ' ' * (bar_length - len(hashes))
-        sys.stdout.write("\rPercent: [{0}] {1}%".format(hashes + spaces, int(round(percent * 100))))
-        sys.stdout.flush()
+    def _bar_widget(self, max_value):
+        return  [
+        'Processing: ', progressbar.Percentage(),
+        ' ', progressbar.Bar(marker='*', left='[', right=']'),
+        ' ', progressbar.Counter(), f'/{max_value}',
+        ' ', progressbar.Timer(),
+        ' ', progressbar.ETA()]
+         
+
+    def _chunk_dataset(self,iterable, chunk_size):
+   
+        dataset_list = list(enumerate(iterable))
+        
+        # Split the dataset list into chunks
+        for i in range(0, len(dataset_list), chunk_size):
+            yield dataset_list[i:i + chunk_size]
+
 
     def _get_candidates(self, im):
         candidates = extract_candidates(im)

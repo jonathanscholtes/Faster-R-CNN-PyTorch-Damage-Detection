@@ -7,6 +7,7 @@ opencv-python-headless
 pandas
 pickleshare
 Pillow
+progressbar2
 pycocotools
 scikit-image
 scikit-learn
