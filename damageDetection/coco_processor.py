@@ -56,7 +56,17 @@ class COCOProcessor:
         
         # Return bounding box in the format [x_min, y_min, width, height]
         return [x_min, y_min, x_max, y_max]
-
+    
+    def _segmentation_corners_to_rotated_bbox(self, corners):
+        """Convert segmentation corners to a rotated bounding box."""
+        centre = np.mean(np.array(corners), 0)
+        theta = self._calc_bearing(corners[0], corners[1])
+        rotation = np.array([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
+        out_points = np.matmul(corners - centre, rotation) + centre
+        x, y = list(out_points[0, :])
+        w, h = list(out_points[2, :] - out_points[0, :])
+        return [x, y, w, h, theta]
+    
     def _segmentation_to_corners(self, segmentation, img_width, img_height):
         """Convert segmentation data into corner coordinates."""
         corners = [[segmentation[x] * img_width, segmentation[x + 1] * img_height]
@@ -113,17 +123,15 @@ class COCOProcessor:
                 img_width = image_json['width']
                 img_height = image_json['height']
 
-                # Convert segmentation to corners and process bounding boxes
-                corners = self._segmentation_to_corners(segmentation, img_width, img_height)
-                #self.all_corners.append(corners)
-                #bbox = annotation_json['bbox']
+                 # Convert segmentation to corners and process bounding boxes
+                corners = self._segmentation_to_corners(segmentation, img_width, img_height)                
+                bbox = annotation_json['bbox']
 
-                bbox = self._segmentation_corners_to_bbox(corners)
-                #x, y, b_w, b_h = self._bbox_from_list(bbox, img_width, img_height)
+                s_x, s_y, w, h, theta = self._segmentation_corners_to_rotated_bbox(corners)
+                x, y, b_w, b_h = self._bbox_from_list(bbox, img_width, img_height)
 
                 annotation_json['segmentation'] = [c for sublist in corners for c in sublist]
-                annotation_json['bbox'] = bbox
-                annotation_json['corners'] = corners
+                annotation_json['bbox'] = [(x - w / 2), (y - h / 2), (x + w / 2), (y + h / 2)]
 
                 self.annotations_file['images'].append(image_json)
                 self.annotations_file['annotations'].append(annotation_json)

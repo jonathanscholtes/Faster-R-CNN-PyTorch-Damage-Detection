@@ -34,7 +34,7 @@ def main(prep=False, train=False, infer=False, infer_source="", infer_dest=""):
     """
 
     annotations_path = 'annotations\\annotations.json'
-    source_image_path = f"{os.path.dirname((os.path.dirname(os.path.abspath(__file__))))}\data\container_damage"
+    source_image_path = f"{os.path.dirname((os.path.dirname(os.path.abspath(__file__))))}\\data\\training\\container_images"
     coco_path = 'cocofiles\\damaged_container_coco.json'
     model_path="trained_models/frcnn_damage.pt"
 
