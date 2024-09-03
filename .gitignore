@@ -4,7 +4,7 @@ __pycache__/
 runs
 mlruns
 *.pt
-data
+data/training
 containerDetection/training.json
 containerDetection/val.json
 damageDetection/test.py

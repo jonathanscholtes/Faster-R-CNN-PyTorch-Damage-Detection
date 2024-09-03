@@ -3,7 +3,8 @@
 
 This repository contains the implementation of a **damage detection** system  using a ResNet50-based **Faster R-CNN** as reviwed in the article [Faster R-CNN Unleashed: Crafting an End-to-End Solution for Damage Detection](https://stochasticcoder.com/2023/11/20/faster-r-cnn-unleashed-crafting-an-end-to-end-solution-for-damage-detection/). It includes the steps from data preparation to training and inferencing. The project leverages **PyTorch**, **MLflow** for experiment tracking, and **TensorBoard** for monitoring model training.  The use of Faster R-CNN enables efficient and precise damage assessment by focusing on relevant regions, while ResNet50 enhances feature extraction for better classification of damage versus non-damage elements.
 
-![detected](../images/img1.png)
+![detected](../images/damage_matrix.png)
+
 
 ## Table of Contents
 
@@ -12,6 +13,7 @@ This repository contains the implementation of a **damage detection** system  us
 - [Usage](#usage)
   - [Preparing Data](#preparing-data)
   - [Training the Model](#training-the-model)
+  - [Model Inferencing](#model-inferencing)
 - [Experiments Tracking](#experiments-tracking)
 - [License](#license)
 - [Disclaimer](#disclaimer)
@@ -98,13 +100,13 @@ After the model has been trained, you can perform inference on a single image pa
 <ins>Inference Single Image:</ins>
 
 ```bash
-python damage_detection.py --infer -infer_source='<path>\data\captured_images\3_hill_9afe1737-21f7-4c2b-8576-225e79a06dbe_44R8_1.png'
+python damage_detection.py --infer -infer_source='<path>\Faster-R-CNN-PyTorch-Damage-Detection\data\testing\container_images\2_hill_02fd9905-e47d-4f4f-a8e7-c821d0f40685_15SN_2.png' 
 ```
 
 Running the above command will output the bounding box of the detected container (bbs) and rotation (theta).
 
 ```bash
-[{'bbs': [1.5755553279438467e-05, 0.34037946077582776, 0.8073451248222778, 0.6308845540233812], 'theta': -0.14000000059604645, 'image_path': '<path>\\data\\captured_images\\3_hill_9afe1737-21f7-4c2b-8576-225e79a06dbe_44R8_1.png'}]
+[{'damage': [{'bbs': [475, 330, 555, 370]}, {'bbs': [268, 362, 318, 385]}, {'bbs': [178, 347, 231, 368]}], 'tags': [{'bbs': [735, 290, 747, 328]}], 'image_path': '<path>\\Faster-R-CNN-PyTorch-Damage-Detection\\data\\testing\\container_images\\2_hill_02fd9905-e47d-4f4f-a8e7-c821d0f40685_15SN_2.png'}]
 ```
 
 Passing a directory to **infer_source** will batch process all images in the directory:
@@ -112,25 +114,24 @@ Passing a directory to **infer_source** will batch process all images in the dir
 <ins>Batch Inference Directory:</ins>
 
 ```bash
-python container_detection.py --infer --infer_source='<path>\data\captured_images'
+python damage_detection.py --infer -infer_source='<path>\Faster-R-CNN-PyTorch-Damage-Detection\data\testing\container_images'
 ```
 
-It is also possible to save the detected container to an output directory by passing the output directory path to the **-infer_des** argument.
+It is also possible to save the detected damage to an output directory by passing the output directory path to the **-infer_des** argument.
 
 <ins>Inference with Output Images:</ins>
 
 ```bash
-python container_detection.py --infer -infer_source='<path>\data\captured_images\3_hill_9afe1737-21f7-4c2b-8576-225e79a06dbe_44R8_1.png' -infer_dest='<path>\data\container_damage\'
+python damage_detection.py --infer -infer_source='<path>\Faster-R-CNN-PyTorch-Damage-Detection\data\testing\container_images\2_hill_02fd9905-e47d-4f4f-a8e7-c821d0f40685_15SN_2.png' -infer_dest='<path>\Faster-R-CNN-PyTorch-Damage-Detection\data\testing\container_damage'
 ```
 Running the above command will add the output file path to the json results and write the extracted container to the specified path.
 
 ```bash
-[{'bbs': [1.5755553279438467e-05, 0.34037946077582776, 0.8073451248222778, 0.6308845540233812], 'theta': -0.14000000059604645, 'image_path': '<path>\\data\\captured_images\\3_hill_9afe1737-21f7-4c2b-8576-225e79a06dbe_44R8_1.png', 'output_file': '<path>\\data\\container_damage\\3_hill_9afe1737-21f7-4c2b-8576-225e79a06dbe_44R8_1.png'}]
+[{'damage': [{'bbs': [475, 330, 555, 370]}, {'bbs': [268, 362, 318, 385]}, {'bbs': [178, 347, 231, 368]}], 'tags': [{'bbs': [735, 290, 747, 328]}], 'image_path': '<path>\\Faster-R-CNN-PyTorch-Damage-Detection\\data\\testing\\container_images\\2_hill_02fd9905-e47d-4f4f-a8e7-c821d0f40685_15SN_2.png', 'output_file': '<path>\\Faster-R-CNN-PyTorch-Damage-Detection\\data\\testing\\container_damage\\2_hill_02fd9905-e47d-4f4f-a8e7-c821d0f40685_15SN_2.png'}]
 ```
 
-Output images are scaled (800,800) and rotated (theta) for damage detection
 
-![extracted](../images/extracted_container.png)
+![extracted](../images/inf_damage1.png)
 
 <br/>
 

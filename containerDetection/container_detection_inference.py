@@ -177,7 +177,7 @@ class ContainerDetectionInference:
         for file_path in files:
             file_name = os.path.basename(file_path)
             result = self._process_image(file_path)
-            result['image_path']=file_path
+            result['image_path']=str(file_path)
 
             if output_path != None and os.path.isdir(output_path):
                 output_file = os.path.join(output_path, file_name)

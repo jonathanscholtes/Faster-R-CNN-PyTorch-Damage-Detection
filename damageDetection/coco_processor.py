@@ -65,7 +65,7 @@ class COCOProcessor:
         out_points = np.matmul(corners - centre, rotation) + centre
         x, y = list(out_points[0, :])
         w, h = list(out_points[2, :] - out_points[0, :])
-        return [x, y, w, h, theta]
+        return [x, y, abs(w), abs(h), theta]
     
     def _segmentation_to_corners(self, segmentation, img_width, img_height):
         """Convert segmentation data into corner coordinates."""
@@ -80,25 +80,20 @@ class COCOProcessor:
         corners = temp
 
         # Find the center and sort corners accordingly
-        centre = np.mean(np.array(corners), axis=0)
+        centre = np.mean(np.array(corners), 0)
+        for i in range(len(corners)):
+            if corners[i][0] < centre[0]:
+                if corners[i][1] < centre[1]:
+                    corners[i], corners[0] = corners[0], corners[i]
+                else:
+                    corners[i], corners[3] = corners[3], corners[i]
+            else:
+                if corners[i][1] < centre[1]:
+                    corners[i], corners[1] = corners[1], corners[i]
+                else:
+                    corners[i], corners[2] = corners[2], corners[i]
 
-        # Sort the corners based on their positions relative to the center
-        sorted_corners = [None] * 4
-        for corner in corners:
-            if corner[0] < centre[0] and corner[1] < centre[1]:
-                # Top-left
-                sorted_corners[0] = corner
-            elif corner[0] >= centre[0] and corner[1] < centre[1]:
-                # Top-right
-                sorted_corners[1] = corner
-            elif corner[0] >= centre[0] and corner[1] >= centre[1]:
-                # Bottom-right
-                sorted_corners[2] = corner
-            elif corner[0] < centre[0] and corner[1] >= centre[1]:
-                # Bottom-left
-                sorted_corners[3] = corner
-
-        return np.array(sorted_corners)
+        return corners
 
     def _bbox_from_list(self, bbox, img_width, img_height):
         """Convert a normalized bounding box into corner coordinates."""

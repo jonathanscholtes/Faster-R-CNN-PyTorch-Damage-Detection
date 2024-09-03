@@ -4,6 +4,7 @@ import argparse
 import sys
 from pathlib import Path
 from damage_detection_trainer import DamageDetectionTrainer
+from damage_detection_inference import DamageDetectionInference
 
 
 def prepare_data(source_image_path,coco_path,annotations_path):
@@ -25,6 +26,25 @@ def train_model(annotations_path,source_image_path,model_path):
     trainer.train_and_validate()
     print("Model training completed.")
 
+def inference_model(infer_source,infer_dest,model_path):
+   
+    inference = DamageDetectionInference(model_path=model_path)
+    image_files = []
+    
+    if os.path.isdir(infer_source):
+        dir_path = Path(infer_source)
+        for file in dir_path.rglob('*'):
+            if file.is_file():
+                image_files.append(file)
+    else:
+        image_files.append(infer_source)
+
+    print(f"{len(image_files)} images for inference")
+
+    results = inference.inference_model(image_files,infer_dest)
+
+    print(results)
+    return results
 
 def main(prep=False, train=False, infer=False, infer_source="", infer_dest=""):
     """
@@ -46,12 +66,13 @@ def main(prep=False, train=False, infer=False, infer_source="", infer_dest=""):
         if train:
             train_model(annotations_path,source_image_path,model_path)
 
-        #if infer:
-        #    inference_model(infer_source=infer_source,infer_dest=infer_dest, model_path=model_path)
+        if infer:
+            inference_model(infer_source=infer_source,infer_dest=infer_dest, model_path=model_path)
         
 
     except Exception as error:
         print('Exception: ' + str(error)) 
+        raise error
 
 
 if __name__ == "__main__":

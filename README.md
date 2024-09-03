@@ -6,7 +6,7 @@
    ### Features 
    :large_blue_diamond: **[Container Detection](containerDetection)**: Identify and localize shipping containers in varied environments using Faster R-CNN with a VGG16 backbone. 
    
-   :large_blue_diamond: **Damage Detection**: After container detection, the system checks for damages using a ResNet50 based Faster R-CNN, distinguishing between actual damage and superficial markings like logos or text. 
+   :large_blue_diamond: **[Damage Detection](damageDetection)**: After container detection, the system checks for damages using a ResNet50 based Faster R-CNN, distinguishing between actual damage and superficial markings like logos or text. 
    
 ![pipeline](/images/pipeline1.png)
 

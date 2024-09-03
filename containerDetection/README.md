@@ -13,6 +13,7 @@ This repository contains the implementation of a **container detection** system 
 - [Usage](#usage)
   - [Preparing Data](#preparing-data)
   - [Training the Model](#training-the-model)
+  - [Model Inferencing](#model-inferencing)
 - [Experiments Tracking](#experiments-tracking)
 - [License](#license)
 - [Disclaimer](#disclaimer)
@@ -102,13 +103,13 @@ After the model has been trained, you can perform inference on a single image pa
 <ins>Inference Single Image:</ins>
 
 ```bash
-python container_detection.py --infer -infer_source='<path>\data\captured_images\3_hill_9afe1737-21f7-4c2b-8576-225e79a06dbe_44R8_1.png'
+python container_detection.py --infer -infer_source='<path>\Faster-R-CNN-PyTorch-Damage-Detection\data\testing\captured_images\2_hill_02fd9905-e47d-4f4f-a8e7-c821d0f40685_15SN_2.png'
 ```
 
 Running the above command will output the bounding box of the detected container (bbs) and rotation (theta).
 
 ```bash
-[{'bbs': [1.5755553279438467e-05, 0.34037946077582776, 0.8073451248222778, 0.6308845540233812], 'theta': -0.14000000059604645, 'image_path': '<path>\\data\\captured_images\\3_hill_9afe1737-21f7-4c2b-8576-225e79a06dbe_44R8_1.png'}]
+[{'bbs': [0.00817223576844105, 0.3526776061988756, 0.7704609172918727, 0.6595895496029102], 'theta': -0.07999999821186066, 'image_path': '<path>\\Faster-R-CNN-PyTorch-Damage-Detection\\data\\testing\\captured_images\\2_hill_02fd9905-e47d-4f4f-a8e7-c821d0f40685_15SN_2.png'}]
 ```
 
 Passing a directory to **infer_source** will batch process all images in the directory:
@@ -116,7 +117,7 @@ Passing a directory to **infer_source** will batch process all images in the dir
 <ins>Batch Inference Directory:</ins>
 
 ```bash
-python container_detection.py --infer --infer_source='<path>\data\captured_images'
+python container_detection.py --infer -infer_source='<path>\Faster-R-CNN-PyTorch-Damage-Detection\data\testing\captured_images'
 ```
 
 It is also possible to save the detected container to an output directory by passing the output directory path to the **-infer_des** argument.
@@ -124,12 +125,12 @@ It is also possible to save the detected container to an output directory by pas
 <ins>Inference with Output Images:</ins>
 
 ```bash
-python container_detection.py --infer -infer_source='<path>\data\captured_images\3_hill_9afe1737-21f7-4c2b-8576-225e79a06dbe_44R8_1.png' -infer_dest='<path>\data\container_damage\'
+python container_detection.py --infer -infer_source='<path>\Faster-R-CNN-PyTorch-Damage-Detection\data\testing\captured_images\2_hill_02fd9905-e47d-4f4f-a8e7-c821d0f40685_15SN_2.png' -infer_dest='<path>\Faster-R-CNN-PyTorch-Damage-Detection\data\testing\container_images'
 ```
 Running the above command will add the output file path to the json results and write the extracted container to the specified path.
 
 ```bash
-[{'bbs': [1.5755553279438467e-05, 0.34037946077582776, 0.8073451248222778, 0.6308845540233812], 'theta': -0.14000000059604645, 'image_path': '<path>\\data\\captured_images\\3_hill_9afe1737-21f7-4c2b-8576-225e79a06dbe_44R8_1.png', 'output_file': '<path>\\data\\container_damage\\3_hill_9afe1737-21f7-4c2b-8576-225e79a06dbe_44R8_1.png'}]
+[{'bbs': [0.00817223576844105, 0.3526776061988756, 0.7704609172918727, 0.6595895496029102], 'theta': -0.07999999821186066, 'image_path': '<path>\\Faster-R-CNN-PyTorch-Damage-Detection\\data\\testing\\captured_images\\2_hill_02fd9905-e47d-4f4f-a8e7-c821d0f40685_15SN_2.png', 'output_file': '<path>\\Faster-R-CNN-PyTorch-Damage-Detection\\data\\testing\\container_images\\2_hill_02fd9905-e47d-4f4f-a8e7-c821d0f40685_15SN_2.png'}]
 ```
 
 Output images are scaled (800,800) and rotated (theta) for damage detection
