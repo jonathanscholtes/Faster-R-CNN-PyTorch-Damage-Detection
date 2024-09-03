@@ -39,10 +39,16 @@ Instance Segmentation polygons are captured using Azure Machine Learning [Data L
 python -m venv venv
 ```
 
+<br/>
+
+
 2. Activate Python Environment
 ```bash
 venv\Scripts\activate
 ```
+
+<br/>
+
 
 3. Install Pytorch (Cuda):
 
@@ -50,12 +56,18 @@ venv\Scripts\activate
 python -m pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu117
 ```
 
+<br/>
+
+
 4. Install the required Python dependencies:
 
 ```bash
 python -m pip install -r requirements.txt
 ```
 
+<br/>
+
+5. :floppy_disk: **Download** the training data from: [Stochastic Coder - Training Faster-R-CNN-PyTorch-Damage-Detection.zip](https://stochasticcoder.com/wp-content/uploads/2024/09/Faster-R-CNN-PyTorch-Damage-Detection.zip) if not already downloaded and extracted. The code requires the training data to be organized within the **data/training** folder structure.
 
 <br/>
 
