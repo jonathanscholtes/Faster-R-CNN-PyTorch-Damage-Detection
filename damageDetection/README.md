@@ -67,7 +67,7 @@ python -m pip install -r requirements.txt
 
 <br/>
 
-5. :floppy_disk: **Download** the training data from: [Stochastic Coder - Training Faster-R-CNN-PyTorch-Damage-Detection.zip](https://stochasticcoder.com/wp-content/uploads/2024/09/Faster-R-CNN-PyTorch-Damage-Detection.zip) if not already downloaded and extracted. The code requires the training data to be organized within the **data/training** folder structure.
+5. :floppy_disk: **Download** the training data from: [Stochastic Coder - Training Faster-R-CNN-PyTorch-Damage-Detection.zip](https://stochasticcoder.com/wp-content/uploads/2024/11/526a1-faster-r-cnn-pytorch-damage-detection.zip) if not already downloaded and extracted. The code requires the training data to be organized within the **data/training** folder structure.
 
 <br/>
 
